@@ -2,10 +2,6 @@
    Chase Gindlesperger
  */
 
-.on {
-	background-color: green;
-}
-
 #simzone {
 	background-color: #e5e5e5;
 	width: 800px;
@@ -19,16 +15,20 @@
 	height: 100px;
 	position: absolute;
 	border: 1px solid grey;
+	background-color: white;
 	box-shadow: 2px 2px 19px #aaa;
    -o-box-shadow: 2px 2px 19px #aaa;
    -webkit-box-shadow: 2px 2px 19px #aaa;
    -moz-box-shadow: 2px 2px 19px #aaa;
 	opacity:0.8;
 }
+.on {
+	background-color: green;
+}
 
 #selectorbar {
 	float: left;
-	height: 800px;
+	height: 600px;
 	width: 15%;
 	display: inline-block;
 }
@@ -36,7 +36,7 @@
 .selector {
 	width: 100%;
 	background-color: #939496;
-	height: 100px;
+	height: 75px;
 }
 
 .icon {
