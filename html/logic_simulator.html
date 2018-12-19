@@ -1,0 +1,28 @@
+<!-- logic_simulator.html
+     Chase Gindlesperger -->
+
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Logic Simulator</title>
+	<meta charset = 'UTF-8'>
+	<link href = '../css/logic_simulator.css' rel = 'stylesheet' type = 'text/css'/>
+	<script src="../js/jsplumb.min.js"></script>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script src="http://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.9.2/jquery-ui.min.js"></script>
+	<script src='../js/logic_simulator.js'></script>
+</head>
+<body>
+	<div id = "selectorbar">
+		<div class = "selector" id = "addinput" onclick="Input()"><h1>INPUT</h1></div>
+		<div class = "selector" id = "addnot" onclick="Not()"> <h1>NOT</h1></div>
+		<div class = "selector" id = "addand" onclick="And()"><h1>AND</h1></div>
+		<div class = "selector" id = "addnand" onclick="Nand()"><h1>NAND</h1></div>
+		<div class = "selector" id = "addor" onclick="Or()"><h1>OR</h1></div>
+		<div class = "selector" id = "addnor" onclick="Nor()"><h1>NOR</h1></div>
+		<div class = "selector" id = "addxor" onclick="Xor()"><h1>XOR</h1></div>
+		<div class = "selector" id = "addoutput" onclick="Output()"><h1>OUTPUT</h1></div>
+	</div>
+	<div id="simzone"></div>
+</body>
+</html>

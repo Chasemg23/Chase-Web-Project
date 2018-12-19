@@ -1,0 +1,66 @@
+/* logic_simulator.css
+   Chase Gindlesperger
+ */
+
+.on {
+	background-color: green;
+}
+
+#simzone {
+	background-color: #e5e5e5;
+	width: 800px;
+	height: 800px;
+	display: inline-block;
+	position: absolute;
+}
+
+.node {
+	width: 100px;
+	height: 100px;
+	position: absolute;
+	border: 1px solid grey;
+	box-shadow: 2px 2px 19px #aaa;
+   -o-box-shadow: 2px 2px 19px #aaa;
+   -webkit-box-shadow: 2px 2px 19px #aaa;
+   -moz-box-shadow: 2px 2px 19px #aaa;
+	opacity:0.8;
+}
+
+#selectorbar {
+	float: left;
+	height: 800px;
+	width: 15%;
+	display: inline-block;
+}
+
+.selector {
+	width: 100%;
+	background-color: #939496;
+	height: 100px;
+}
+
+.icon {
+	float: left;
+	height: 100px;
+	width: 100px;
+}
+
+.selector h1 {
+	width: 100%;
+	line-height: 100px;
+	text-align: center;
+	margin: 0;
+}
+
+.selector:hover {
+	background-color: #666666;
+}
+
+.selector h1:hover {
+	color: white;
+}
+
+
+
+
+
