@@ -12,15 +12,33 @@ var outputs = 1
 var nodeArray = [];
 
 var commonSource = {
+	paintStyle:{
+		fill: "#44c767",
+		strokeStyle:"#44c767",
+		fillStyle:"transparent",
+		radius:10,
+		lineWidth:2
+	},
 	isSource:true,
-	connector: ["Straight"],
+	connector: ["Flowchart"],
+    connectorStyle:{ outlineStroke:"#44c767", strokeWidth:2 },
 	maxConnections: 3
 }
 
 var commonTarget = {
+	paintStyle:{
+		fill: "white",
+		outlineStroke: "#44c767",
+		strokeStyle:"#44c767",
+		fillStyle:"transparent",
+		radius:10,
+		lineWidth:2
+	},
 	isTarget:true,
-	connector: ["Straight"],
-	maxConnections: 1
+	connector: ["Flowchart"],
+    connectorStyle:{ outlineStroke:"#44c767", strokeWidth:2 },
+	maxConnections: 1,
+
 }
 
 class Node {
@@ -33,6 +51,7 @@ class Node {
 }
 
 function run() {
+	console.log("RUN");
 	var outputArray = nodeArray.filter(function(v, i) {
   			return (v["type"] == "output");
 	});
@@ -41,16 +60,33 @@ function run() {
 	}
 }
 
-function testin(type, num) {
-	target = $('#' + type + '-' + num);
-	console.log(target.data('state'));
-}
+jsPlumb.bind('connection',run);
+jsPlumb.bind('connectionDetached',run);
 
 jsPlumb.ready(function(){
 	jsPlumb.setContainer(jsPlumb.getSelector('#simzone'));
-	jsPlumb.bind('connnection', run);
 });
 
+function isInputAndUpdate(nodeObjectId){
+	var objectIdSplit = nodeObjectId.split('-');
+	if(objectIdSplit[0] != "input"){
+		var inputObject = nodeArray.filter(function(v, i) {
+  			return ((v["type"] == objectIdSplit[0] && v["num"] == objectIdSplit[1]));
+		});
+		inputObject[0].update();
+	}
+}
+
+$(document).ready(function(){
+	$(document).on("click", "button.toggle" , function() {
+		id = $(this).parent().attr("id");
+		num = id.substring(6,7);
+		var result = nodeArray.filter(function(v, i) {
+  			return ((v["type"] == "input" && v["num"] == num));
+		});
+		result[0].toggle(id);
+	});		
+});
 
 function updateDrag(){
 	comps = jsPlumb.getSelector('.node')
@@ -65,36 +101,20 @@ class Input extends Node{
 		$('#' + this.id).data('state', 'off');
 		jsPlumb.addEndpoint(this.id, {anchor:"RightMiddle"}, commonSource);
 		updateDrag();
-	};
-
-	toggle(id){
-		if(this.state == 0){
-			this.state = 1
-			$('#'+id).toggleClass("on");
-			$('#'+id).data('state', 'on');
-		} else {
-			this.state = 0
-			$('#'+id).toggleClass("on");
-			$('#'+id).data('state', 'off');
-		}
-	};
-
-	update() {
-		console.log("INPUT UPDATE CLASS WAS CALLED");
 	}
 
+	toggle(id){
+		if($('#'+this.id).data('state') == 'off'){
+			$('#'+id).addClass("on");
+			$('#'+id).data('state', 'on');
+			run();
+		} else {
+			$('#'+id).removeClass("on");
+			$('#'+id).data('state', 'off');
+			run();
+		}
+	}
 }
-
-$(document).ready(function(){
-	$(document).on("click", "button.toggle" , function() {
-		id = $(this).parent().attr("id");
-		num = id.substring(6,7);
-		var result = nodeArray.filter(function(v, i) {
-  			return ((v["type"] == "input" && v["num"] == num));
-		});
-		result[0].toggle(id);
-	});		
-});
 
 class Not extends Node {
 	constructor (type, num) {
@@ -113,28 +133,22 @@ class Not extends Node {
 	}
 
 	updateState() {
-		var notInput = this.gateInputs[0].sourceId;
-		isInputAndUpdate(notInput);
-		if ($('#'+notInput).data('state') == "on"){
-			$('#'+this.id).data('state','off');
+		if(this.gateInputs[0]){
+			var notInput = this.gateInputs[0].sourceId;
+			isInputAndUpdate(notInput);
+			if ($('#'+notInput).data('state') == "on"){
+				$('#'+this.id).data('state','off');
+			} else {
+				$('#'+this.id).data('state','on');
+			}
 		} else {
-			$('#'+this.id).data('state','on');
+			$('#'+this.id).data('state','off');
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
+
 	update() {
 		this.getInputs();
 		this.updateState();
-	}
-}
-
-function isInputAndUpdate(nodeObjectId){
-	var objectIdSplit = nodeObjectId.split('-');
-	if(objectIdSplit[0] != "input"){
-		var inputObject = nodeArray.filter(function(v, i) {
-  			return ((v["type"] == objectIdSplit[0] && v["num"] == objectIdSplit[1]));
-		});
-		inputObject[0].update();
 	}
 }
 
@@ -157,18 +171,21 @@ class And extends Node {
 
 	updateState(){
 		var andInputs = [];
-		andInputs[0] = this.gateInputs[0].sourceId;
-		andInputs[1] = this.gateInputs[1].sourceId;
-		for(i = 0; i < 2; i++){
-			isInputAndUpdate(andInputs[i]);
-		}
+		if(this.gateInputs[0] && this.gateInputs[1]){
+			andInputs[0] = this.gateInputs[0].sourceId;
+			andInputs[1] = this.gateInputs[1].sourceId;
+			for(i = 0; i < 2; i++){
+				isInputAndUpdate(andInputs[i]);
+			}
 
-		if (($('#'+andInputs[0]).data('state') == 'on') && ($('#'+andInputs[1]).data('state') == 'on')){
-			$('#'+this.id).data('state','on');
+			if (($('#'+andInputs[0]).data('state') == 'on') && ($('#'+andInputs[1]).data('state') == 'on')){
+				$('#'+this.id).data('state','on');
+			} else {
+				$('#'+this.id).data('state','off');		
+			}
 		} else {
-			$('#'+this.id).data('state','off');		
+			$('#'+this.id).data('state','off');				
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
 
 	update() {
@@ -196,18 +213,21 @@ class Nand extends Node {
 
 	updateState(){
 		var nandInputs = [];
-		nandInputs[0] = this.gateInputs[0].sourceId;
-		nandInputs[1] = this.gateInputs[1].sourceId;
-		for(i = 0; i < 2; i++){
-			isInputAndUpdate(nandInputs[i]);
-		}
+		if(this.gateInputs[0] && this.gateInputs[1]){
+			nandInputs[0] = this.gateInputs[0].sourceId;
+			nandInputs[1] = this.gateInputs[1].sourceId;
+			for(i = 0; i < 2; i++){
+				isInputAndUpdate(nandInputs[i]);
+			}
 
-		if (($('#'+nandInputs[0]).data('state') == 'on') && ($('#'+nandInputs[1]).data('state') == 'on')){
-			$('#'+this.id).data('state','off');
+			if (($('#'+nandInputs[0]).data('state') == 'on') && ($('#'+nandInputs[1]).data('state') == 'on')){
+				$('#'+this.id).data('state','off');
+			} else {
+				$('#'+this.id).data('state','on');		
+			}
 		} else {
-			$('#'+this.id).data('state','on');		
+			$('#'+this.id).data('state','off');		
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
 
 	update() {
@@ -235,18 +255,21 @@ class Or extends Node {
 
 	updateState(){
 		var orInputs = [];
-		orInputs[0] = this.gateInputs[0].sourceId;
-		orInputs[1] = this.gateInputs[1].sourceId;
-		for(i = 0; i < 2; i++){
-			isInputAndUpdate(orInputs[i]);
-		}
+		if(this.gateInputs[0] && this.gateInputs[1]){
+			orInputs[0] = this.gateInputs[0].sourceId;
+			orInputs[1] = this.gateInputs[1].sourceId;
+			for(i = 0; i < 2; i++){
+				isInputAndUpdate(orInputs[i]);
+			}
 
-		if (($('#'+orInputs[0]).data('state') == 'off') && ($('#'+orInputs[1]).data('state') == 'off')){
-			$('#'+this.id).data('state','off');
+			if (($('#'+orInputs[0]).data('state') == 'off') && ($('#'+orInputs[1]).data('state') == 'off')){
+				$('#'+this.id).data('state','off');
+			} else {
+				$('#'+this.id).data('state','on');		
+			}
 		} else {
-			$('#'+this.id).data('state','on');		
+			$('#'+this.id).data('state','off');
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
 
 	update() {
@@ -266,6 +289,7 @@ class Nor extends Node{
 		jsPlumb.addEndpoint(this.id, {anchor:"RightMiddle"}, commonSource);
 		updateDrag();
 	}
+
 	getInputs(){
 		this.gateInputs = [];
 		this.gateInputs = jsPlumb.getConnections({target:this.id});
@@ -273,18 +297,21 @@ class Nor extends Node{
 
 	updateState(){
 		var norInputs = [];
-		norInputs[0] = this.gateInputs[0].sourceId;
-		norInputs[1] = this.gateInputs[1].sourceId;
-		for(i = 0; i < 2; i++){
-			isInputAndUpdate(norInputs[i]);
-		}
+		if(this.gateInputs[0] && this.gateInputs[1]){
+			norInputs[0] = this.gateInputs[0].sourceId;
+			norInputs[1] = this.gateInputs[1].sourceId;
+			for(i = 0; i < 2; i++){
+				isInputAndUpdate(norInputs[i]);
+			}
 
-		if (($('#'+norInputs[0]).data('state') == 'off') && ($('#'+norInputs[1]).data('state') == 'off')){
-			$('#'+this.id).data('state','on');
+			if (($('#'+norInputs[0]).data('state') == 'off') && ($('#'+norInputs[1]).data('state') == 'off')){
+				$('#'+this.id).data('state','on');
+			} else {
+				$('#'+this.id).data('state','off');		
+			}
 		} else {
-			$('#'+this.id).data('state','off');		
+			$('#'+this.id).data('state','off');			
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
 
 	update() {
@@ -304,6 +331,7 @@ class Xor extends Node {
 		jsPlumb.addEndpoint(this.id, {anchor:"RightMiddle"}, commonSource);
 		updateDrag();
 	}
+
 	getInputs(){
 		this.gateInputs = [];
 		this.gateInputs = jsPlumb.getConnections({target:this.id});
@@ -311,18 +339,21 @@ class Xor extends Node {
 
 	updateState(){
 		var xorInputs = [];
-		xorInputs[0] = this.gateInputs[0].sourceId;
-		xorInputs[1] = this.gateInputs[1].sourceId;
-		for(i = 0; i < 2; i++){
-			isInputAndUpdate(xorInputs[i]);
-		}
+		if(this.gateInputs[0] && this.gateInputs[1]){
+			xorInputs[0] = this.gateInputs[0].sourceId;
+			xorInputs[1] = this.gateInputs[1].sourceId;
+			for(i = 0; i < 2; i++){
+				isInputAndUpdate(xorInputs[i]);
+			}
 
-		if ($('#'+xorInputs[0]).data('state') != $('#'+xorInputs[1]).data('state')){
-			$('#'+this.id).data('state','on');
+			if ($('#'+xorInputs[0]).data('state') != $('#'+xorInputs[1]).data('state')){
+				$('#'+this.id).data('state','on');
+			} else {
+				$('#'+this.id).data('state','off');		
+			}
 		} else {
-			$('#'+this.id).data('state','off');		
+			$('#'+this.id).data('state','off');				
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
 
 	update() {
@@ -335,7 +366,7 @@ class Output extends Node {
 	constructor (type, num) {
 		super(type,num);
 		this.id = "output-" + outputs;
-		$('#simzone').append('<div class="node" id="'+this.id+'"><p>Output</p></div>');
+		$('#simzone').append('<div class="node" id="'+this.id+'"><p>OUTPUT</p></div>');
 		$('#' + this.id).data('state', 'off');
 		jsPlumb.addEndpoint(this.id, {anchor:"LeftMiddle"}, commonTarget);
 		updateDrag();
@@ -347,25 +378,25 @@ class Output extends Node {
 	}
 
 	updateState() {
-		var outputInput = this.gateInputs[0].sourceId;
-		isInputAndUpdate(outputInput);
-		if ($('#'+outputInput).data('state') == "on"){
-			$('#'+this.id).data('state','on');
-			$('#'+this.id).addClass('on');
+		if(this.gateInputs[0]){
+			var outputInput = this.gateInputs[0].sourceId;
+			isInputAndUpdate(outputInput);
+			if ($('#'+outputInput).data('state') == "on"){
+				$('#'+this.id).data('state','on');
+				$('#'+this.id).addClass('on');
+			} else {
+				$('#'+this.id).data('state','off');
+				$('#'+this.id).removeClass('on');
+			}
 		} else {
 			$('#'+this.id).data('state','off');
-			$('#'+this.id).removeClass('on');
 		}
-		console.log(this.id + " STATE: " + $('#'+this.id).data('state'));
 	}
-
 
 	update() {
 		this.getInputs();
 		this.updateState();
 	}
-
-
 }
 
 function Add_Input() {

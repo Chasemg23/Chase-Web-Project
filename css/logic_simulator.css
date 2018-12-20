@@ -4,17 +4,18 @@
 
 #simzone {
 	background-color: #e5e5e5;
-	width: 800px;
-	height: 800px;
+	width: 75%;
+	height:95vh;
 	display: inline-block;
 	position: absolute;
+	margin-left: 5%;
 }
 
 .node {
 	width: 100px;
 	height: 100px;
 	position: absolute;
-	border: 1px solid grey;
+	border: 1px solid #44c767;
 	background-color: white;
 	box-shadow: 2px 2px 19px #aaa;
    -o-box-shadow: 2px 2px 19px #aaa;
@@ -22,44 +23,63 @@
    -moz-box-shadow: 2px 2px 19px #aaa;
 	opacity:0.8;
 }
+
+.node p {
+	height: 100%;
+	width: 100%;
+	margin: 0;
+	line-height: 100px;
+	font-family:Arial;
+	text-align: center;
+}
+
+.toggle{
+	height:50%;
+	width: 50%;
+	margin: 25%;
+}
+
 .on {
 	background-color: green;
+}
+#wrapper {
+	float: right;
+	width: 85%;
 }
 
 #selectorbar {
 	float: left;
-	height: 600px;
+	height: 95vh;
+	position: absolute;
 	width: 15%;
 	display: inline-block;
 }
 
 .selector {
-	width: 100%;
-	background-color: #939496;
-	height: 75px;
-}
-
-.icon {
-	float: left;
-	height: 100px;
-	width: 100px;
-}
-
-.selector h1 {
-	width: 100%;
-	line-height: 100px;
 	text-align: center;
-	margin: 0;
+	width: 100%;
+	height: 12.5%;
+	-moz-box-shadow: -7px 0px 15px -1px #3dc21b;
+	-webkit-box-shadow: -7px 0px 15px -1px #3dc21b;
+	box-shadow: -7px 0px 15px -1px #3dc21b;
+	background-color: #44c767;
+	border:1px solid #18ab29;
+	display:inline-block;
+	cursor:pointer;
+	color:#ffffff;
+	font-family:Arial;
+	font-size:10px;
+	text-decoration:none;
+	text-shadow:0px 2px 3px #2f6627;
 }
 
 .selector:hover {
-	background-color: #666666;
+	background-color:#42bd00;
 }
-
-.selector h1:hover {
-	color: white;
+.selector:active {
+	position:relative;
+	top:1px;
 }
-
 
 
 
