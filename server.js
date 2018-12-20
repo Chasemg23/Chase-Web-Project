@@ -11,6 +11,6 @@ app.route('/')
 
 
 
-app.listen("7000", function() {
-	console.log("Server running on port 7000");
+app.listen("80", function() {
+	console.log("Server running on port 80");
 });
